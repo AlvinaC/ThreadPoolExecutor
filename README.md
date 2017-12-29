@@ -3,6 +3,9 @@ Demonstrates use of ThreadpoolExecutors , Dagger , Retrofit , Service
 
 Scenario
 
+![ScreenShot](https://raw.githubusercontent.com/AlvinaC/Assignment/master/screenshot/scenario.png)
+
+
 1) Need to download multiple files parallelly in the background
 2) Show progress of download in the notification tray
 
