@@ -15,6 +15,7 @@ Used Components
 Out of scope
 
 1) When the app process is killed the download starts again, if any download is running the status regarding that is not saved in this project, but the code can be extended for the same
+2) Not checking the internet connection- but code can be extended for the same
 
 
 
