@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">ThreadPoolExecutor</string>
+    <string name="ok">OK</string>
+    <string name="permission_rationale">Write permission is needed for core functionality</string>
+    <string name="permission_denied_explanation">Permission was denied, but is needed for core
+        functionality.</string>
+    <string name="settings">Settings</string>
 </resources>

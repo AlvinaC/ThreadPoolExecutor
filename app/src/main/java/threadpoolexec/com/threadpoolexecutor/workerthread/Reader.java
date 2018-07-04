@@ -15,8 +15,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import okhttp3.ResponseBody;
+import threadpoolexec.com.threadpoolexecutor.MainActivity;
 import threadpoolexec.com.threadpoolexecutor.R;
 import threadpoolexec.com.threadpoolexecutor.models.DownloadObject;
+import threadpoolexec.com.threadpoolexecutor.models.Events;
+import threadpoolexec.com.threadpoolexecutor.util.CustomApplication;
 
 /**
  * Reads the stream
@@ -89,6 +92,9 @@ public class Reader implements Runnable {
             output.write(data, 0, count);
         }
         onDownloadComplete(i);
+        ((CustomApplication) ((MainActivity) ctx).getApplication())
+                .bus()
+                .send(new Events.CompleteEvent());
         output.flush();
         output.close();
         bis.close();
@@ -117,5 +123,6 @@ public class Reader implements Runnable {
         notificationBuilder.setSmallIcon(R.drawable.ic_download);
         notificationBuilder.setContentText("File Downloaded");
         notificationManager.notify(i, notificationBuilder.build());
+        ((CustomApplication)ctx).bus().send(new Events.CompleteEvent());
     }
 }
