@@ -1,6 +1,8 @@
 package threadpoolexec.com.threadpoolexecutor.util;
 
 import android.app.Application;
+import android.content.Context;
+import android.preference.PreferenceManager;
 
 import threadpoolexec.com.threadpoolexecutor.DI.DaggerNetworkComponent;
 import threadpoolexec.com.threadpoolexecutor.DI.NetworkComponent;
@@ -32,6 +34,18 @@ public class CustomApplication extends Application {
 
     public RxBus bus() {
         return bus;
+    }
+
+    public static boolean requestingUpdates(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(Constants.IS_DOWNLOADING, false);
+    }
+
+    public static void setRequestingUpdates(Context context, boolean requestingUpdates) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(Constants.IS_DOWNLOADING, requestingUpdates)
+                .apply();
     }
 
 }

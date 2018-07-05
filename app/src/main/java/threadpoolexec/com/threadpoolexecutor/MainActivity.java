@@ -5,10 +5,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -20,8 +22,10 @@ import android.widget.Button;
 
 import threadpoolexec.com.threadpoolexecutor.services.DownloaderService;
 import threadpoolexec.com.threadpoolexecutor.services.LocalBinder;
+import threadpoolexec.com.threadpoolexecutor.util.Constants;
+import threadpoolexec.com.threadpoolexecutor.util.CustomApplication;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static String TAG = "MainActivity";
 
@@ -30,17 +34,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button btn_start_dwnld;
 
+    private Intent i;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
         setListener();
-        setButtonsState(false);
-        if(!checkPermissions())
+        if (!checkPermissions())
             requestPermissions();
-        else
-            setButtonsState(true);
     }
 
     private void setListener() {
@@ -54,6 +57,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStart() {
         super.onStart();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+        setButtonsState(CustomApplication.requestingUpdates(this));
+        doBindService();
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             Log.v(TAG, "Starting and binding service");
         }
@@ -68,11 +75,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             unbindService(mConnection);
             mBounded = false;
         }
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
     }
 
-    public void doBindService(Intent i) {
-        bindService(i, mConnection,
-                Context.BIND_AUTO_CREATE);
+    public void doBindService() {
+        i = new Intent(this, DownloaderService.class);
+        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     public boolean mBounded;
@@ -82,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Service bound");
+                Log.v(TAG, "Service onServiceConnected");
             }
             mService = ((LocalBinder<DownloaderService>) service).getService();
             mBounded = true;
@@ -93,15 +102,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
                 Log.v(TAG, "Service disconnect");
             }
+            mService = null;
             mBounded = false;
         }
     };
 
     @Override
     public void onClick(View view) {
-        Intent i = new Intent(this, DownloaderService.class);
         startService(i);
-        doBindService(i);
     }
 
     private boolean checkPermissions() {
@@ -144,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (grantResults.length <= 0) {
                 Log.i(TAG, "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setButtonsState(true);
-            } else {
                 setButtonsState(false);
+            } else {
+                setButtonsState(true);
                 Snackbar.make(
                         findViewById(R.id.coordinatorLayout),
                         R.string.permission_denied_explanation,
@@ -171,9 +179,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setButtonsState(boolean show) {
-        if (show)
+        if (!show)
             btn_start_dwnld.setEnabled(true);
         else
             btn_start_dwnld.setEnabled(false);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if (s.equals(Constants.IS_DOWNLOADING)) {
+            Log.d(TAG, "isdownloading? " + sharedPreferences.getBoolean(Constants.IS_DOWNLOADING,
+                    false) + "");
+            setButtonsState(sharedPreferences.getBoolean(Constants.IS_DOWNLOADING,
+                    false));
+        }
     }
 }

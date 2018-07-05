@@ -8,8 +8,11 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import threadpoolexec.com.threadpoolexecutor.R;
+import threadpoolexec.com.threadpoolexecutor.models.Events;
 import threadpoolexec.com.threadpoolexecutor.network.RetrofitInterface;
 import threadpoolexec.com.threadpoolexecutor.services.DownloaderService;
+import threadpoolexec.com.threadpoolexecutor.util.CustomApplication;
 
 /**
  * Gets the reponse from the url
@@ -57,7 +60,17 @@ public class Worker implements Runnable {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Reader task = new Reader(ctx, response.body(), i, notificationBuilder, notificationManager);
-                ((DownloaderService) ctx).executor.execute(task);
+                try {
+                    ((DownloaderService) ctx).executor.execute(task);
+                } catch (Exception e) {
+                    notificationManager.cancel(i);
+                    notificationBuilder.setProgress(0, 0, false);
+                    notificationBuilder.setSmallIcon(R.drawable.ic_download);
+                    notificationBuilder.setContentText("Error downloading");
+                    notificationManager.notify(i, notificationBuilder.build());
+                    e.printStackTrace();
+                    ((CustomApplication) ((DownloaderService) ctx).getApplication()).bus().send(new Events.CompleteEvent());
+                }
             }
 
             @Override
