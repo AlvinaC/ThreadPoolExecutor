@@ -59,6 +59,7 @@ public class Worker implements Runnable {
         fileDwnld.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                System.out.println(Thread.currentThread().getName() + " End name");
                 Reader task = new Reader(ctx, response.body(), i, notificationBuilder, notificationManager);
                 try {
                     ((DownloaderService) ctx).executor.execute(task);

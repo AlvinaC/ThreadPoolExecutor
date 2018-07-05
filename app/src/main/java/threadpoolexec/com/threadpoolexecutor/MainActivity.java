@@ -29,10 +29,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public static String TAG = "MainActivity";
 
-    // Used in checking for runtime permissions.
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
-    private Button btn_start_dwnld;
+    private Button btnStartDwnld;
 
     private Intent i;
 
@@ -47,11 +46,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setListener() {
-        btn_start_dwnld.setOnClickListener(this);
+        btnStartDwnld.setOnClickListener(this);
     }
 
     private void init() {
-        btn_start_dwnld = (Button) findViewById(R.id.btn_download);
+        btnStartDwnld = (Button) findViewById(R.id.btn_download);
     }
 
     @Override
@@ -180,16 +179,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setButtonsState(boolean show) {
         if (!show)
-            btn_start_dwnld.setEnabled(true);
+            btnStartDwnld.setEnabled(true);
         else
-            btn_start_dwnld.setEnabled(false);
+            btnStartDwnld.setEnabled(false);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals(Constants.IS_DOWNLOADING)) {
-            Log.d(TAG, "isdownloading? " + sharedPreferences.getBoolean(Constants.IS_DOWNLOADING,
-                    false) + "");
             setButtonsState(sharedPreferences.getBoolean(Constants.IS_DOWNLOADING,
                     false));
         }

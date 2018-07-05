@@ -22,7 +22,7 @@ public class CustomApplication extends Application {
     public void onCreate() {
         super.onCreate();
         networkComponent = DaggerNetworkComponent.builder()
-                //retrofit needs a baseurl...this url is not used
+                //retrofit needs a baseurl...this url is not used...dynamic urls are used
                 .networksModule(new NetworksModule("http://google.com/"))
                 .build();
         bus = new RxBus();

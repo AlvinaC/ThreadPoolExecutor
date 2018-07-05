@@ -1,9 +1,5 @@
 package threadpoolexec.com.threadpoolexecutor.DI;
 
-/**
- * Created by 10986 on 12/5/2017.
- */
-
 import javax.inject.Singleton;
 
 import dagger.Component;

@@ -43,6 +43,8 @@ public class DownloaderService extends Service {
 
     private static final String CHANNEL_ID = "channel_01";
 
+    private static int completeTaskCount = 0;
+
     private ArrayList<String> urls = new ArrayList<>();
     private RetrofitInterface DIinterface;
     public ThreadPoolExecutor executor;
@@ -52,7 +54,6 @@ public class DownloaderService extends Service {
     @Inject
     Retrofit retrofit;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -61,6 +62,7 @@ public class DownloaderService extends Service {
         // Android O requires a Notification Channel.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.app_name);
+
             // Create the channel for the notification
             NotificationChannel mChannel =
                     new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
@@ -131,12 +133,11 @@ public class DownloaderService extends Service {
 
     public void onDestroy() {
         Log.d(TAG, "Service onDestroy");
+        awaitTerminationAfterShutdown(executor);
         super.onDestroy();
     }
 
     private Notification getNotification() {
-        Intent intent = new Intent(this, DownloaderService.class);
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentText("Download continued...")
                 .setContentTitle(getResources().getString(R.string.app_name))
@@ -164,10 +165,9 @@ public class DownloaderService extends Service {
                     @Override
                     public void accept(Object object) throws Exception {
                         if (object instanceof Events.CompleteEvent) {
-                            Log.d(TAG, "active task count :" + executor.getActiveCount() + " completed :" + executor.getCompletedTaskCount());
-                            if (executor.getActiveCount() == 0) {
-                                Log.d(TAG, "inside active task count 0");
-                                awaitTerminationAfterShutdown(executor);
+                            completeTaskCount++;
+                            if (completeTaskCount == 5) {
+                                completeTaskCount = 0;
                                 stopForeground(true);
                                 stopSelf();
                                 CustomApplication.setRequestingUpdates(DownloaderService.this, false);
@@ -175,10 +175,9 @@ public class DownloaderService extends Service {
                         }
                     }
                 }));
-
     }
 
-    public void awaitTerminationAfterShutdown(ExecutorService threadPool) {
+    private void awaitTerminationAfterShutdown(ExecutorService threadPool) {
         threadPool.shutdown();
         try {
             if (!threadPool.awaitTermination(60, TimeUnit.SECONDS)) {

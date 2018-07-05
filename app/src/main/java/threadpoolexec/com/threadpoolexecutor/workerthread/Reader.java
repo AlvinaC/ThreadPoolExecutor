@@ -50,10 +50,11 @@ public class Reader implements Runnable {
             downloadFile(body, i);
         } catch (Exception e) {
             e.printStackTrace();
+            executeForAll(i, "Error downloading...");
         }
     }
 
-    private void downloadFile(ResponseBody body, int i) throws IOException {
+    private void downloadFile(ResponseBody body, int i) throws Exception {
         System.out.println(Thread.currentThread().getName() + " downloadFile(ResponseBody body)");
         int count;
         byte data[] = new byte[1024 * 4];
@@ -116,10 +117,14 @@ public class Reader implements Runnable {
         DownloadObject download = new DownloadObject();
         download.setProgress(100);
         sendIntent(download);
+        executeForAll(i, "File downloaded...");
+    }
+
+    private void executeForAll(int i, String message) {
         notificationManager.cancel(i);
         notificationBuilder.setProgress(0, 0, false);
         notificationBuilder.setSmallIcon(R.drawable.ic_download);
-        notificationBuilder.setContentText("File Downloaded");
+        notificationBuilder.setContentText(message);
         notificationManager.notify(i, notificationBuilder.build());
         ((CustomApplication) ((DownloaderService) ctx).getApplication()).bus().send(new Events.CompleteEvent());
     }
