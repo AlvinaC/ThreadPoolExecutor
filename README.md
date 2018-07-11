@@ -1,5 +1,5 @@
 # ThreadPoolExecutor
-Demonstrates use of ThreadpoolExecutors , Dagger , Retrofit , Service
+Demonstrates use of ThreadpoolExecutors , Dagger , Retrofit ,Foreground Service
 
 Scenario
 
