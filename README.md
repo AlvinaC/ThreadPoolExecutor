@@ -1,5 +1,5 @@
 # ThreadPoolExecutor
-Demonstrates use of ThreadpoolExecutors , Dagger , Retrofit ,Foreground Service
+Demonstrates use of ThreadpoolExecutors , Dagger , Retrofit ,Foreground Service(master branch - Java, Kotlin branch - kotlin)
 
 Scenario
 
