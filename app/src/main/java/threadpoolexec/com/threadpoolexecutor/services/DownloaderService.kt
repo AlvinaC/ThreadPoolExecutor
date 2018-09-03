@@ -25,10 +25,6 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-/**
- * Service creates a pool and transfers the download job to individual threads
- * Threads run in parallel
- */
 class DownloaderService : Service() {
 
     private val urls = ArrayList<String>()
