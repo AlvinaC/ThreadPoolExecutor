@@ -1,3 +1,2 @@
 * linguist-vendored
 *.kt linguist-vendored=false
-*.kt linguist-detectable=true
